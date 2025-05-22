@@ -21,7 +21,7 @@ pygame.init()
 pygame.display.set_mode((200, 100))
 clock = pygame.time.Clock()
 
-canvas_w, canvas_h = 800, 600
+canvas_w, canvas_h = 1000, 600
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
 
 player = Player("walk1.png", "walk2.png", x=100, y=450)
@@ -45,7 +45,7 @@ while True:
     current_img = player.get_image()
     canvas = paste_transparent(canvas, current_img, player.x, player.y)
 
-    cv2.imshow("角色控制", canvas)
+    cv2.imshow("maerio", canvas)
     if cv2.waitKey(30) == 27:
         break
 
