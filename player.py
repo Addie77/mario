@@ -25,6 +25,7 @@ class Player:
 
     def _load_image(self, path):
         img = cv2.imread(path)
+        img = cv2.resize(img, (100, 100))
         h, w = img.shape[:2]
         corners = [img[0, 0], img[0, w-1], img[h-1, 0], img[h-1, w-1]]
         bg_color = np.mean(corners, axis=0)
