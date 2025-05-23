@@ -5,16 +5,16 @@ import pygame
 import sys
 from player import Player
 
-def paste_transparent(background, overlay, x, y):
+def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
     alpha = overlay[:, :, 3] / 255.0
     h, w = overlay.shape[:2]
 
     for c in range(3):
-        background[y:y+h, x:x+w, c] = (
-            background[y:y+h, x:x+w, c] * (1 - alpha) + bgr[:, :, c] * alpha
+        imgBackground[y:y+h, x:x+w, c] = (
+            imgBackground[y:y+h, x:x+w, c] * (1 - alpha) + bgr[:, :, c] * alpha
         )
-    return background
+    return imgBackground
 
 # 初始化
 pygame.init()
