@@ -6,8 +6,8 @@ class Player:
         self.img1 = self.remove_background_with_alpha(img1_path)
         self.img2 = self.remove_background_with_alpha(img2_path)
 
-        self.img1 = cv2.resize(self.img1, (100, 150))
-        self.img2 = cv2.resize(self.img2, (100, 150))
+        self.img1 = cv2.resize(self.img1, (100, 100))
+        self.img2 = cv2.resize(self.img2, (100, 100))
 
         self.x = x
         self.y = y
@@ -21,7 +21,7 @@ class Player:
         self.direction = "right"
         self.width = self.img1.shape[1]
         self.height = self.img1.shape[0]
-        self.floor_y = 550  # 地板 y 座標
+        self.floor_y = 538  # 地板 y 座標
 
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
