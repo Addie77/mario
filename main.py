@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 import sys
 from player import Player
+import random
 
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
@@ -21,8 +22,11 @@ pygame.init()
 pygame.display.set_mode((200, 100))
 clock = pygame.time.Clock()
 
-canvas_w, canvas_h = 1000, 600
+canvas_w, canvas_h = 800, 600
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
+
+#世界
+world_w, world_h = 10000, 600
 
 player = Player("walk1.png", "walk2.png", x=100, y=450)
 
@@ -41,7 +45,19 @@ while True:
 
     player.update(key_map, canvas_w)
 
-    canvas[:] = 255
+    canvas[:] = (255, 206, 135)
+    #雲1
+    cv2.ellipse(canvas, (150, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
+    cv2.ellipse(canvas, (200, 90), (50, 35), 0, 0, 360, (255, 255, 255), -1)
+    cv2.ellipse(canvas, (250, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
+    #雲2
+    cv2.ellipse(canvas, (500, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
+    cv2.ellipse(canvas, (540, 70), (40, 25), 0, 0, 360, (255, 255, 255), -1)
+    cv2.ellipse(canvas, (580, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
+
+    #地板
+    cv2.rectangle(canvas, (0, 525), (world_w, world_h), (45,82,160), -1)
+    
     current_img = player.get_image()
     canvas = paste_transparent(canvas, current_img, player.x, player.y)
 
