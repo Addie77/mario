@@ -52,9 +52,10 @@ class Player:
         self.x = max(0, min(self.x, canvas_width - self.width))
 
         # 跳躍
-        if key_map['jump'] and self.jump_count <= 3:
+        if key_map['jump'] and self.jump_count <= 2:
             self.vy = self.jump_strength
             self.jump_count += 1
+            cv2.waitKey(20)  # 等待一段時間以避免過快的跳躍
 
         # 重力與垂直移動
         self.vy += 1.5

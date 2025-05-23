@@ -69,12 +69,13 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
+    
     key_map = {
         'left': keys[pygame.K_a] or keys[pygame.K_LEFT],
         'right': keys[pygame.K_d] or keys[pygame.K_RIGHT],
         'jump': keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]
     }
-
+    
     player.update(key_map, world_w, platforms)
 
     # 限制玩家不要超出視窗左邊界（player.x >= camera_x）
@@ -107,7 +108,7 @@ while True:
     canvas = paste_transparent(canvas, current_img, int(player.x - camera_x), int(player.y))
 
     cv2.imshow("maerio", canvas)
-    cv2.waitKey(30)
+    cv2.waitKey(25)
     clock.tick(60)
 
     if keys[pygame.K_ESCAPE]:
