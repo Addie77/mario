@@ -27,7 +27,20 @@ canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
 
 #世界
 world_w, world_h = 10000, 600
-
+#平台資料
+platforms = [
+    (200,350,350,320),
+    (500,400,700,370),
+    (800,250,1000,220),
+    (1200,230,1400,200),
+    (1600,300,1800,270),
+    (2000,400,2200,370),
+    (2400,350,2600,320),
+    (2800,300,3000,270),
+    (3200,250,3400,220),
+    (3600,200,3800,170),
+    (4000,150,4200,120)
+]
 player = Player("walk1.png", "walk2.png", x=100, y=450)
 
 while True:
@@ -42,8 +55,8 @@ while True:
         'right': keys[pygame.K_d] or keys[pygame.K_RIGHT],
         'jump': keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]
     }
-
-    player.update(key_map, canvas_w)
+    
+    player.update(key_map, canvas_w, platforms)
 
     canvas[:] = (255, 206, 135)
     #雲1
@@ -57,15 +70,26 @@ while True:
 
     #地板
     cv2.rectangle(canvas, (0, 525), (world_w, world_h), (45,82,160), -1)
-    
+    #平台
+    for platform in platforms:
+        x1, y1, x2, y2 = platform
+        cv2.rectangle(canvas, (x1, y1), (x2, y2), (45,82,160), -1)
     current_img = player.get_image()
-    canvas = paste_transparent(canvas, current_img, player.x, player.y)
+    canvas = paste_transparent(canvas, current_img, int(player.x), int(player.y))
+
 
     cv2.imshow("maerio", canvas)
-    if cv2.waitKey(30) == 27:
+     # ⚠️ 不使用 cv2.waitKey 來處理鍵盤，只讓它維持窗口刷新（必要條件）
+    # 不處理返回值！否則會干擾 pygame 控制
+    cv2.waitKey(30)
+
+    # Pygame 用來限制更新率
+    clock.tick(60)
+
+    # 若需要 ESC 離開：
+    if keys[pygame.K_ESCAPE]:
         break
 
-    clock.tick(30)
-
-cv2.destroyAllWindows()
 pygame.quit()
+cv2.destroyAllWindows()
+
