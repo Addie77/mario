@@ -14,7 +14,7 @@ class Player:
         self.vx = 0
         self.vy = 0
         self.speed = 10
-        self.jump_strength = -20
+        self.jump_strength = -22
         self.jump_count = 0  # 二段跳計數
 
         self.frame_flag = True
@@ -67,8 +67,8 @@ class Player:
 
         for x1, y1, x2, y2 in platforms:
             if x1 <= player_center_x <= x2:
-                if self.vy >= 0 and player_bottom >= y2 and self.y <= y2:
-                    self.y = y2 - self.height
+                if self.vy >= 0 and player_bottom >= y1 and (self.y + self.height - self.vy) <= y1:
+                    self.y = y1 - self.height
                     self.vy = 0
                     self.jump_count = 0
                     on_ground = True
