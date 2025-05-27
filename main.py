@@ -143,7 +143,7 @@ while True:
         pipe_base_y = 525  # 地板y座標
         pipe_top_y = pipe_base_y - pipe_height - pipe_top_height
 
-        if 0 <= pipe_x <= canvas_w:  # 在視窗範圍內才畫
+        if -pipe_width < pipe_x < canvas_w:  # 在視窗範圍內才畫
             # 水管主體
             cv2.rectangle(canvas,
                           (pipe_x, pipe_base_y - pipe_height),
