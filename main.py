@@ -36,6 +36,8 @@ def paste_transparent(imgBackground, overlay, x, y):
     return imgBackground
 
 pygame.init()
+pygame.mixer.music.load("bgm.mp3")
+pygame.mixer.music.play(-1)
 pygame.display.set_mode((200, 100))
 clock = pygame.time.Clock()
 
