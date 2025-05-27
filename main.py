@@ -45,6 +45,7 @@ canvas_w, canvas_h = 800, 600
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
 
 world_w, world_h = 10000, 600
+brick = (45, 82, 160)
 
 platforms = [
     (200,350,350,320),
@@ -120,11 +121,44 @@ while True:
     draw_clouds(canvas, camera_x, world_w)
 
     # 地板
-    cv2.rectangle(canvas, (0 - camera_x, 525), (world_w - camera_x, world_h), (45, 82, 160), -1)
+    cv2.rectangle(canvas, (0 - camera_x, 525), (world_w - camera_x, world_h), brick, -1)
+
+    #下方水管(障礙物)
+    pipe_infos = [
+    (1050, 150),
+    (2650, 250),
+    (5050, 400),
+    (6280, 300),
+    (7100, 200),
+    (7900, 350),
+    (8700, 250)
+    ]
+
+    pipe_width = 50
+    pipe_top_height = 20
+    pipe_top_width = 70  # 上方突出寬度
+
+    for pipe_x_world, pipe_height in pipe_infos:
+        pipe_x = pipe_x_world - camera_x
+        pipe_base_y = 525  # 地板y座標
+        pipe_top_y = pipe_base_y - pipe_height - pipe_top_height
+
+        if 0 <= pipe_x <= canvas_w:  # 在視窗範圍內才畫
+            # 水管主體
+            cv2.rectangle(canvas,
+                          (pipe_x, pipe_base_y - pipe_height),
+                          (pipe_x + pipe_width, pipe_base_y),
+                          (0, 150, 0), -1)  # 深綠色
+
+            # 水管上方突出部分
+            cv2.rectangle(canvas,
+                          (pipe_x - (pipe_top_width - pipe_width) // 2, pipe_top_y),
+                          (pipe_x + pipe_width + (pipe_top_width - pipe_width) // 2, pipe_top_y + pipe_top_height),
+                          (0, 180, 0), -1)  # 稍亮綠色
 
     # 平台
     for x1, y1, x2, y2 in platforms:
-        cv2.rectangle(canvas, (x1 - camera_x, y1+15), (x2 - camera_x, y2+15), (45, 82, 160), -1)
+        cv2.rectangle(canvas, (x1 - camera_x, y1+15), (x2 - camera_x, y2+15), brick, -1)
 
     current_img = player.get_image()
     canvas = paste_transparent(canvas, current_img, int(player.x - camera_x), int(player.y))
