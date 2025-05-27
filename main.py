@@ -135,7 +135,7 @@ while True:
     ]
 
     pipe_width = 50
-    pipe_top_height = 20
+    pipe_top_height = 30
     pipe_top_width = 70  # 上方突出寬度
 
     for pipe_x_world, pipe_height in pipe_infos:
