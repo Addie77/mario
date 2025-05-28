@@ -38,7 +38,7 @@ class Player:
         b, g, r = cv2.split(img)
         return cv2.merge((b, g, r, mask))  # BGRA
 
-    def update(self, key_map, canvas_width, platforms):
+    def update(self, key_map, canvas_width, platforms, pipe_infos):
         # 水平移動
         self.vx = 0
         if key_map['left']:
@@ -74,7 +74,34 @@ class Player:
                     self.jump_count = 0
                     on_ground = True
                     break
+        # --- Pipe 碰撞偵測 ---
+        pipe_width = 50
+        pipe_top_height = 30
+        for pipe_x, pipe_height in pipe_infos:
+            px1 = pipe_x
+            px2 = pipe_x + pipe_width
+            py1 = 525 - pipe_height - pipe_top_height
+            py2 = 525
 
+            # 站在水管頂部
+            if px1 <= player_center_x <= px2:
+                if self.vy >= 0 and player_bottom >= py1 and (self.y + self.height - self.vy) <= py1:
+                    self.y = py1 - self.height
+                    self.vy = 0
+                    self.jump_count = 0
+                    on_ground = True
+                    break
+
+            # 左右側碰撞（防止穿過水管側邊）
+            # 玩家往右撞到水管左側
+            if self.vx > 0 and self.x + self.width > px1 and self.x < px1 and player_bottom > py1 + 5:
+                if self.y + self.height > py1 + 5 and self.y < py2:
+                    self.x = px1 - self.width
+            # 玩家往左撞到水管右側
+            if self.vx < 0 and self.x < px2 and self.x + self.width > px2 and player_bottom > py1 + 5:
+                if self.y + self.height > py1 + 5 and self.y < py2:
+                    self.x = px2
+                
         # 地板碰撞
         if not on_ground and self.y + self.height >= self.floor_y:
             self.y = self.floor_y - self.height

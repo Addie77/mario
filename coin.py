@@ -60,10 +60,4 @@ coins = [
     Coin(8500, 140),
 ]
 
-if __name__ == "__main__":
-    canva = np.ones((600, 800, 3), dtype=np.uint8) * 255
-    for coin in coins:
-        coin.draw(canva)
-    cv2.imshow("Coins", canva)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+

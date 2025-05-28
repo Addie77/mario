@@ -48,11 +48,20 @@ def draw_pipes(canvas, camera_x):
         pipe_top_y = pipe_base_y - pipe_height - pipe_top_height
 
         if -pipe_width < pipe_x < canvas.shape[1]:
-            cv2.rectangle(canvas,
-                          (pipe_x, pipe_base_y - pipe_height),
+            cv2.rectangle(canvas, #畫水管底部
+                          (pipe_x, pipe_base_y - pipe_height-10),
                           (pipe_x + pipe_width, pipe_base_y),
                           (0, 150, 0), -1)
-            cv2.rectangle(canvas,
-                          (pipe_x - (pipe_top_width - pipe_width) // 2, pipe_top_y),
-                          (pipe_x + pipe_width + (pipe_top_width - pipe_width) // 2, pipe_top_y + pipe_top_height),
+            cv2.rectangle(canvas, #畫水管頂部
+                          (pipe_x - (pipe_top_width - pipe_width) // 2, pipe_top_y-10),
+                          (pipe_x + pipe_width + (pipe_top_width - pipe_width) // 2, pipe_top_y + pipe_top_height-10),
                           (0, 180, 0), -1)
+def draw_clouds(canvas, camera_x, world_w):
+    for base_x in range(150, world_w, 800):
+        cv2.ellipse(canvas, (base_x - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
+        cv2.ellipse(canvas, (base_x + 50 - camera_x, 90), (50, 35), 0, 0, 360, (255, 255, 255), -1)
+        cv2.ellipse(canvas, (base_x + 100 - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
+
+        cv2.ellipse(canvas, (base_x + 350 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
+        cv2.ellipse(canvas, (base_x + 390 - camera_x, 70), (40, 25), 0, 0, 360, (255, 255, 255), -1)
+        cv2.ellipse(canvas, (base_x + 430 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)

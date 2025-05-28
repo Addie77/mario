@@ -7,7 +7,8 @@ from player import Player
 from castle import Castle
 from castle import Flag
 from coin import coins
-from background_element import platforms,pipe_infos,draw_platforms,draw_pipes
+from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,draw_clouds
+
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
     alpha = overlay[:, :, 3] / 255.0
@@ -55,15 +56,6 @@ player = Player("walk1.png", "walk2.png", x=100, y=300)
 
 camera_x = 0  # 相機X軸位置
 
-def draw_clouds(canvas, camera_x, world_w):
-    for base_x in range(150, world_w, 800):
-        cv2.ellipse(canvas, (base_x - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
-        cv2.ellipse(canvas, (base_x + 50 - camera_x, 90), (50, 35), 0, 0, 360, (255, 255, 255), -1)
-        cv2.ellipse(canvas, (base_x + 100 - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
-
-        cv2.ellipse(canvas, (base_x + 350 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
-        cv2.ellipse(canvas, (base_x + 390 - camera_x, 70), (40, 25), 0, 0, 360, (255, 255, 255), -1)
-        cv2.ellipse(canvas, (base_x + 430 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
 
 castle = Castle(x=9700, y=375)
 flag = Flag(x=9500, y=150)
@@ -84,7 +76,7 @@ while True:
         'jump': keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]
     }
 
-    player.update(key_map, world_w, platforms)
+    player.update(key_map, world_w, platforms, pipe_infos)
 
     if player.x < camera_x:
         player.x = camera_x
@@ -95,10 +87,9 @@ while True:
 
     canvas[:] = (255, 206, 135)
     brick = (45, 82, 160)
-    draw_clouds(canvas, camera_x, world_w)
+    
     cv2.rectangle(canvas, (0 - camera_x, 525), (world_w - camera_x, world_h), brick, -1)
 #------------------------------------------------------------------------------
-    
 #------------------------------------------------------------------------------
     for coin in coins:
         coin.draw(canvas, camera_x)
@@ -106,6 +97,7 @@ while True:
     
     flag.draw(canvas, camera_x)
     castle.draw(canvas, camera_x)
+    draw_clouds(canvas, camera_x, world_w)
     draw_platforms(canvas, camera_x)
     draw_pipes(canvas, camera_x)
 
