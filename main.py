@@ -4,7 +4,7 @@ import pygame
 import sys
 from player import Player
 from castle import Castle
-import random
+from flag import Flag
 
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
@@ -91,6 +91,7 @@ def draw_clouds(canvas, camera_x, world_w):
         cv2.ellipse(canvas, (base_x + 430 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
 
 castle = Castle(x=9700, y=375)
+flag = Flag(x=9500, y=150)
 
 while True:
     for event in pygame.event.get():
@@ -162,6 +163,7 @@ while True:
     for x1, y1, x2, y2 in platforms:
         cv2.rectangle(canvas, (x1 - camera_x, y1+15), (x2 - camera_x, y2+15), brick, -1)
 
+    flag.draw(canvas, camera_x)
     castle.draw(canvas, camera_x)
 
     current_img = player.get_image()
