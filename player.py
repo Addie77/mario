@@ -6,8 +6,8 @@ class Player:
         self.img1 = self.remove_background_with_alpha(img1_path)
         self.img2 = self.remove_background_with_alpha(img2_path)
 
-        self.img1 = cv2.resize(self.img1, (100, 100))
-        self.img2 = cv2.resize(self.img2, (100, 100))
+        self.img1 = cv2.resize(self.img1, (70, 70))
+        self.img2 = cv2.resize(self.img2, (70, 70))
 
         self.x = x
         self.y = y

@@ -19,7 +19,7 @@ class Castle:
         # 門窗
         cv2.rectangle(canvas, (x+20, y+25), (x+60, y+70), (0,0,0), -1)
         cv2.rectangle(canvas, (x+140, y+25), (x+180, y+70), (0,0,0), -1)
-        cv2.rectangle(canvas, (x+70, y+90), (x+130, y+150), (0,0,0), -1)
+        cv2.rectangle(canvas, (x+70, y+80), (x+130, y+150), (0,0,0), -1)
         # 側塔
         cv2.rectangle(canvas, (x-55, y-75), (x+0, y+150), self.deep_brick, -1)
         cv2.rectangle(canvas, (x-65, y-95), (x+10, y-75), self.brick, -1)
