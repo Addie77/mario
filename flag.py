@@ -10,7 +10,7 @@ class Flag:
         x = self.x - camera_x
         y = self.y
         # 旗桿
-        cv2.rectangle(canvas, (x, y), (x+20, y+375), (168,168,168), -1)
+        cv2.rectangle(canvas, (x, y), (x+20, y+375), (150,150,150), -1)
         # 旗子
         cv2.rectangle(canvas, (x+20, y), (x+140, y+70), (0,0,0), -1)
 

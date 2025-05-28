@@ -2,9 +2,11 @@ import cv2
 import numpy as np
 import pygame
 import sys
+import time
 from player import Player
 from castle import Castle
 from flag import Flag
+from coin import coins
 
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
@@ -76,22 +78,22 @@ platforms = [
 
 player = Player("walk1.png", "walk2.png", x=100, y=300)
 
-camera_x = 0  # 全域變數，用來追蹤相機X軸位置（只能往右移）
+camera_x = 0  # 相機X軸位置
 
 def draw_clouds(canvas, camera_x, world_w):
     for base_x in range(150, world_w, 800):
-        # 第一層雲（三個橢圓組成一組）
         cv2.ellipse(canvas, (base_x - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
         cv2.ellipse(canvas, (base_x + 50 - camera_x, 90), (50, 35), 0, 0, 360, (255, 255, 255), -1)
         cv2.ellipse(canvas, (base_x + 100 - camera_x, 100), (60, 40), 0, 0, 360, (255, 255, 255), -1)
 
-        # 第二層雲（三個橢圓組成一組，稍微下移）
         cv2.ellipse(canvas, (base_x + 350 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
         cv2.ellipse(canvas, (base_x + 390 - camera_x, 70), (40, 25), 0, 0, 360, (255, 255, 255), -1)
         cv2.ellipse(canvas, (base_x + 430 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
 
 castle = Castle(x=9700, y=375)
 flag = Flag(x=9500, y=150)
+
+start_time = time.time()  # 記錄開始時間
 
 while True:
     for event in pygame.event.get():
@@ -100,66 +102,52 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
-    
+
     key_map = {
         'left': keys[pygame.K_a] or keys[pygame.K_LEFT],
         'right': keys[pygame.K_d] or keys[pygame.K_RIGHT],
         'jump': keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]
     }
-    
+
     player.update(key_map, world_w, platforms)
 
-    # 限制玩家不要超出視窗左邊界（player.x >= camera_x）
     if player.x < camera_x:
         player.x = camera_x
 
-    # 相機只往右移動
     desired_camera_x = player.x - canvas_w // 2
     if desired_camera_x > camera_x:
         camera_x = min(desired_camera_x, world_w - canvas_w)
 
     canvas[:] = (255, 206, 135)
-
-    # 畫布初始化後，加上這一行畫雲
     draw_clouds(canvas, camera_x, world_w)
-
-    # 地板
     cv2.rectangle(canvas, (0 - camera_x, 525), (world_w - camera_x, world_h), brick, -1)
 
-    #下方水管(障礙物)
     pipe_infos = [
-    (1050, 150),
-    (2650, 250),
-    (5050, 400),
-    (6280, 300),
-    (7100, 290),
-    (7900, 350),
-    (8700, 250)
+        (1050, 150), (2650, 250), (5050, 400),
+        (6280, 300), (7100, 290), (7900, 350), (8700, 250)
     ]
-
     pipe_width = 50
     pipe_top_height = 30
-    pipe_top_width = 70  # 上方突出寬度
+    pipe_top_width = 70
 
     for pipe_x_world, pipe_height in pipe_infos:
         pipe_x = pipe_x_world - camera_x
-        pipe_base_y = 525  # 地板y座標
+        pipe_base_y = 525
         pipe_top_y = pipe_base_y - pipe_height - pipe_top_height
 
-        if -pipe_width < pipe_x < canvas_w:  # 在視窗範圍內才畫
-            # 水管主體
+        if -pipe_width < pipe_x < canvas_w:
             cv2.rectangle(canvas,
                           (pipe_x, pipe_base_y - pipe_height),
                           (pipe_x + pipe_width, pipe_base_y),
-                          (0, 150, 0), -1)  # 深綠色
-
-            # 水管上方突出部分
+                          (0, 150, 0), -1)
             cv2.rectangle(canvas,
                           (pipe_x - (pipe_top_width - pipe_width) // 2, pipe_top_y),
                           (pipe_x + pipe_width + (pipe_top_width - pipe_width) // 2, pipe_top_y + pipe_top_height),
-                          (0, 180, 0), -1)  # 稍亮綠色
+                          (0, 180, 0), -1)
 
-    # 平台
+    for coin in coins:
+        coin.draw(canvas, camera_x)
+
     for x1, y1, x2, y2 in platforms:
         cv2.rectangle(canvas, (x1 - camera_x, y1+15), (x2 - camera_x, y2+15), brick, -1)
 
@@ -168,6 +156,12 @@ while True:
 
     current_img = player.get_image()
     canvas = paste_transparent(canvas, current_img, int(player.x - camera_x), int(player.y))
+
+    # 顯示計時器
+    elapsed_time = int(time.time() - start_time)
+    timer_text = f"{elapsed_time}s"
+    cv2.putText(canvas, timer_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
+                1, (0, 0, 0), 2, cv2.LINE_AA)
 
     cv2.imshow("mario", canvas)
     cv2.waitKey(25)
