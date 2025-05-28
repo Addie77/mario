@@ -5,7 +5,7 @@ import sys
 import time
 from player import Player
 from castle import Castle
-from flag import Flag
+from castle import Flag
 from coin import coins
 
 def paste_transparent(imgBackground, overlay, x, y):
