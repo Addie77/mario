@@ -52,7 +52,7 @@ world_w, world_h = 10000, 600
 
 
 
-player = Player("walk1.png", "walk2.png", x=100, y=300)
+player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
 
 camera_x = 0  # 相機X軸位置
 
