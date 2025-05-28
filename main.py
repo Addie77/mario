@@ -3,6 +3,7 @@ import numpy as np
 import pygame
 import sys
 from player import Player
+from castle import Castle
 import random
 
 def paste_transparent(imgBackground, overlay, x, y):
@@ -73,7 +74,7 @@ platforms = [
     (8800,350,9000,320)
 ]
 
-player = Player("walk1.png", "walk2.png", x=100, y=450)
+player = Player("walk1.png", "walk2.png", x=100, y=300)
 
 camera_x = 0  # 全域變數，用來追蹤相機X軸位置（只能往右移）
 
@@ -89,6 +90,7 @@ def draw_clouds(canvas, camera_x, world_w):
         cv2.ellipse(canvas, (base_x + 390 - camera_x, 70), (40, 25), 0, 0, 360, (255, 255, 255), -1)
         cv2.ellipse(canvas, (base_x + 430 - camera_x, 80), (50, 30), 0, 0, 360, (255, 255, 255), -1)
 
+castle = Castle(x=9700, y=375)
 
 while True:
     for event in pygame.event.get():
@@ -160,10 +162,12 @@ while True:
     for x1, y1, x2, y2 in platforms:
         cv2.rectangle(canvas, (x1 - camera_x, y1+15), (x2 - camera_x, y2+15), brick, -1)
 
+    castle.draw(canvas, camera_x)
+
     current_img = player.get_image()
     canvas = paste_transparent(canvas, current_img, int(player.x - camera_x), int(player.y))
 
-    cv2.imshow("maerio", canvas)
+    cv2.imshow("mario", canvas)
     cv2.waitKey(25)
     clock.tick(60)
 
