@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 class Player:
     def __init__(self, img1_path, img2_path, x=100, y=100):
@@ -23,6 +24,13 @@ class Player:
         self.height = self.img1.shape[0]
         self.floor_y = 538  # 地板 y 座標
         self.score = 0  # 新增分數屬性
+
+        self.origin_img1_path = img1_path
+        self.origin_img2_path = img2_path
+        self.star_img1_path = "images/starwalk1.png"
+        self.star_img2_path = "images/starwalk2.png"
+        self.star_mode = False
+        self.star_mode_end_time = 0
 
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
@@ -140,8 +148,22 @@ class Player:
                         self.width = 100
                         self.height = 100
                         remove_list.append(item)
+                    elif hasattr(item, "type") and item.type == "star":
+                        # 進入星星模式
+                        self.img1 = cv2.resize(self.remove_background_with_alpha(self.star_img1_path), (self.width, self.height))
+                        self.img2 = cv2.resize(self.remove_background_with_alpha(self.star_img2_path), (self.width, self.height))
+                        self.star_mode = True
+                        self.star_mode_end_time = time.time() + 5
+                        remove_list.append(item)
             for item in remove_list:
                 items.remove(item)
+
+        # --- 星星模式倒數 ---
+        if self.star_mode and time.time() > self.star_mode_end_time:
+            # 換回原本圖片
+            self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
+            self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (self.width, self.height))
+            self.star_mode = False
 
     def get_image(self):
         # 動畫交替與方向處理
