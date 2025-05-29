@@ -47,6 +47,7 @@ pygame.display.set_mode((200, 100))
 clock = pygame.time.Clock()
 
 canvas_w, canvas_h = 800, 600
+
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
 
 world_w, world_h = 10000, 600

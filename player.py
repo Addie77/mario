@@ -32,6 +32,9 @@ class Player:
         self.star_mode = False
         self.star_mode_end_time = 0
 
+        self.grow_animating = False
+        self.grow_anim_start_time = 0
+
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
         if img is None:
@@ -136,20 +139,20 @@ class Player:
             player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
             remove_list = []
             for item in items:
-                # 假設 item.img 已經 resize 成 100x100
                 h, w = item.img.shape[:2]
                 item_rect = (item.x, item.y, item.x + w, item.y + h)
                 if (player_rect[0] < item_rect[2] and player_rect[2] > item_rect[0] and
                     player_rect[1] < item_rect[3] and player_rect[3] > item_rect[1]):
                     if hasattr(item, "type") and item.type == "mushroom":
-                        # 角色變大
-                        self.img1 = cv2.resize(self.img1, (100, 100))
-                        self.img2 = cv2.resize(self.img2, (100, 100))
-                        self.width = 100
-                        self.height = 100
+                        # 進入變大動畫
+                        self.img1 = cv2.resize(self.img1, (80, 80))
+                        self.img2 = cv2.resize(self.img2, (80, 80))
+                        self.width = 80
+                        self.height = 80
+                        self.grow_animating = True
+                        self.grow_anim_start_time = time.time()
                         remove_list.append(item)
                     elif hasattr(item, "type") and item.type == "star":
-                        # 進入星星模式
                         self.img1 = cv2.resize(self.remove_background_with_alpha(self.star_img1_path), (self.width, self.height))
                         self.img2 = cv2.resize(self.remove_background_with_alpha(self.star_img2_path), (self.width, self.height))
                         self.star_mode = True
@@ -158,9 +161,17 @@ class Player:
             for item in remove_list:
                 items.remove(item)
 
+        # --- 變大動畫進行 ---
+        if self.grow_animating:
+            if time.time() - self.grow_anim_start_time >= 0.5:
+                self.img1 = cv2.resize(self.img1, (100, 100))
+                self.img2 = cv2.resize(self.img2, (100, 100))
+                self.width = 100
+                self.height = 100
+                self.grow_animating = False
+
         # --- 星星模式倒數 ---
         if self.star_mode and time.time() > self.star_mode_end_time:
-            # 換回原本圖片
             self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
             self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (self.width, self.height))
             self.star_mode = False
