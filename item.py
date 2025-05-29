@@ -18,25 +18,33 @@ class Item:
             h, w = self.img.shape[:2]
             x1 = self.x - camera_x
             y1 = self.y
-            # 確保不會超出畫布
-            if 0 <= x1 < canvas.shape[1] and 0 <= y1 < canvas.shape[0]:
-                # 若有透明通道
-                if self.img.shape[2] == 4:
-                    overlay = self.img
-                    bgr = overlay[:, :, :3]
-                    alpha = overlay[:, :, 3] / 255.0
-                    for c in range(3):
-                        canvas[y1:y1+h, x1:x1+w, c] = (
-                            alpha * bgr[:, :, c] +
-                            (1 - alpha) * canvas[y1:y1+h, x1:x1+w, c]
-                        )
-                else:
-                    canvas[y1:y1+h, x1:x1+w] = self.img
+
+            # 計算實際要貼的範圍
+            x1_clip = max(x1, 0)
+            y1_clip = max(y1, 0)
+            x2_clip = min(x1 + w, canvas.shape[1])
+            y2_clip = min(y1 + h, canvas.shape[0])
+
+            # 計算貼圖要裁切的範圍
+            img_x1 = x1_clip - x1
+            img_y1 = y1_clip - y1
+            img_x2 = img_x1 + (x2_clip - x1_clip)
+            img_y2 = img_y1 + (y2_clip - y1_clip)
+
+            if x2_clip > x1_clip and y2_clip > y1_clip:
+                region = canvas[y1_clip:y2_clip, x1_clip:x2_clip]
+                overlay = self.img[img_y1:img_y2, img_x1:img_x2]
+                bgr = overlay[:, :, :3]
+                alpha = overlay[:, :, 3] / 255.0
+                for c in range(3):
+                    region[..., c] = (
+                        region[..., c] * (1 - alpha) + bgr[..., c] * alpha
+                    )
 
 # 你可以自訂生成位置
 item_positions = [
-    (600, 400),
-    (200, 350),
+    (2480, 280),
+    (6480, 190),
 ]
 
 items = [Item(x, y) for x, y in item_positions]
