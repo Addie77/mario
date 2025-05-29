@@ -147,6 +147,8 @@ class Player:
                         # 進入變大動畫
                         self.img1 = cv2.resize(self.img1, (80, 80))
                         self.img2 = cv2.resize(self.img2, (80, 80))
+                        self.y -= 20  # 蘑菇吃掉後稍微往上移動
+                        
                         self.width = 80
                         self.height = 80
                         self.grow_animating = True
@@ -166,10 +168,11 @@ class Player:
             if time.time() - self.grow_anim_start_time >= 0.5:
                 self.img1 = cv2.resize(self.img1, (100, 100))
                 self.img2 = cv2.resize(self.img2, (100, 100))
+                self.y -= 20
                 self.width = 100
                 self.height = 100
                 self.grow_animating = False
-
+            return
         # --- 星星模式倒數 ---
         if self.star_mode and time.time() > self.star_mode_end_time:
             self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
