@@ -39,7 +39,7 @@ class Player:
         b, g, r = cv2.split(img)
         return cv2.merge((b, g, r, mask))  # BGRA
 
-    def update(self, key_map, canvas_width, platforms, pipe_infos, coins=None, world_w=10000):
+    def update(self, key_map, canvas_width, platforms, pipe_infos, coins=None, world_w=10000, items=None):
         # 水平移動
         self.vx = 0
         if key_map['left']:
@@ -122,6 +122,26 @@ class Player:
             for coin in remove_list:
                 coins.remove(coin)
                 self.score += 1  # 每吃到一個金幣加一分
+
+        # --- 蘑菇碰撞偵測 ---
+        if items is not None:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            remove_list = []
+            for item in items:
+                # 假設 item.img 已經 resize 成 100x100
+                h, w = item.img.shape[:2]
+                item_rect = (item.x, item.y, item.x + w, item.y + h)
+                if (player_rect[0] < item_rect[2] and player_rect[2] > item_rect[0] and
+                    player_rect[1] < item_rect[3] and player_rect[3] > item_rect[1]):
+                    if hasattr(item, "type") and item.type == "mushroom":
+                        # 角色變大
+                        self.img1 = cv2.resize(self.img1, (100, 100))
+                        self.img2 = cv2.resize(self.img2, (100, 100))
+                        self.width = 100
+                        self.height = 100
+                        remove_list.append(item)
+            for item in remove_list:
+                items.remove(item)
 
     def get_image(self):
         # 動畫交替與方向處理
