@@ -2,9 +2,10 @@ import cv2
 import numpy as np
 import random
 
-star_img = cv2.imread("star.png", cv2.IMREAD_UNCHANGED)
-mushroom_img = cv2.imread("mushroom.png", cv2.IMREAD_UNCHANGED)
-
+star_img = cv2.imread("images/star.png", cv2.IMREAD_UNCHANGED)
+mushroom_img = cv2.imread("images/mushroom.png", cv2.IMREAD_UNCHANGED)
+star_img = cv2.resize(star_img, (50, 50)) 
+mushroom_img = cv2.resize(mushroom_img, (50, 50))
 class Item:
     def __init__(self, x, y):
         self.x = x
