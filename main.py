@@ -110,6 +110,14 @@ while True:
     cv2.putText(canvas, timer_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                 1, (0, 0, 0), 2, cv2.LINE_AA)
 
+    # 顯示分數（右上角）
+    score_text = f"Score: {player.score}"
+    text_size, _ = cv2.getTextSize(score_text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+    text_x = canvas.shape[1] - text_size[0] - 20
+    text_y = 40
+    cv2.putText(canvas, score_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX,
+                1, (0, 0, 0), 2, cv2.LINE_AA)
+
     cv2.imshow("mario", canvas)
     cv2.waitKey(25)
     clock.tick(60)

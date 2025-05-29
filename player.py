@@ -22,6 +22,7 @@ class Player:
         self.width = self.img1.shape[1]
         self.height = self.img1.shape[0]
         self.floor_y = 538  # 地板 y 座標
+        self.score = 0  # 新增分數屬性
 
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
@@ -120,6 +121,7 @@ class Player:
                     remove_list.append(coin)
             for coin in remove_list:
                 coins.remove(coin)
+                self.score += 1  # 每吃到一個金幣加一分
 
     def get_image(self):
         # 動畫交替與方向處理
