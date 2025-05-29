@@ -77,10 +77,7 @@ while True:
         'jump': keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_SPACE]
     }
 
-    player.update(key_map, world_w, platforms, pipe_infos)
-
-    if player.x < camera_x:
-        player.x = camera_x
+    player.update(key_map, canvas_w, platforms, pipe_infos, coins)
 
     desired_camera_x = player.x - canvas_w // 2
     if desired_camera_x > camera_x:

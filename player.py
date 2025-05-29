@@ -38,7 +38,7 @@ class Player:
         b, g, r = cv2.split(img)
         return cv2.merge((b, g, r, mask))  # BGRA
 
-    def update(self, key_map, canvas_width, platforms, pipe_infos):
+    def update(self, key_map, canvas_width, platforms, pipe_infos, coins=None, world_w=10000):
         # 水平移動
         self.vx = 0
         if key_map['left']:
@@ -49,7 +49,7 @@ class Player:
             self.direction = "right"
 
         self.x += self.vx
-        self.x = max(0, min(self.x, canvas_width - self.width))
+        self.x = max(0, min(self.x, world_w - self.width))
 
         # 跳躍
         if key_map['jump'] and self.jump_count <= 2:
@@ -107,6 +107,19 @@ class Player:
             self.y = self.floor_y - self.height
             self.vy = 0
             self.jump_count = 0
+
+        # --- 金幣碰撞偵測 ---
+        if coins is not None:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            remove_list = []
+            for coin in coins:
+                coin_rect = (coin.x - 10, coin.y - 10, coin.x + 10, coin.y + 10)  # 半徑10
+                # 簡單矩形碰撞判斷
+                if (player_rect[0] < coin_rect[2] and player_rect[2] > coin_rect[0] and
+                    player_rect[1] < coin_rect[3] and player_rect[3] > coin_rect[1]):
+                    remove_list.append(coin)
+            for coin in remove_list:
+                coins.remove(coin)
 
     def get_image(self):
         # 動畫交替與方向處理
