@@ -8,6 +8,7 @@ from castle import Castle
 from castle import Flag
 from coin import coins
 from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,draw_clouds
+from item import items
 
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
@@ -94,6 +95,8 @@ while True:
     for coin in coins:
         coin.draw(canvas, camera_x)
 
+    for item in items:
+        item.draw(canvas, camera_x)
     
     flag.draw(canvas, camera_x)
     castle.draw(canvas, camera_x)
