@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+import pygame  # 加在檔案最上面
 
 class Player:
     def __init__(self, img1_path, img2_path, x=100, y=100):
@@ -133,6 +134,7 @@ class Player:
             for coin in remove_list:
                 coins.remove(coin)
                 self.score += 1  # 每吃到一個金幣加一分
+                pygame.mixer.Sound("music/getcoin.mp3").play()  # 播放音效
 
         # --- 蘑菇碰撞偵測 ---
         if items is not None:
@@ -145,15 +147,16 @@ class Player:
                     player_rect[1] < item_rect[3] and player_rect[3] > item_rect[1]):
                     if hasattr(item, "type") and item.type == "mushroom":
                         # 進入變大動畫
+                        pygame.mixer.Sound("music/grow.mp3").play()  # 播放變大音效
                         self.img1 = cv2.resize(self.img1, (80, 80))
                         self.img2 = cv2.resize(self.img2, (80, 80))
                         self.y -= 20  # 蘑菇吃掉後稍微往上移動
-                        
                         self.width = 80
                         self.height = 80
                         self.grow_animating = True
                         self.grow_anim_start_time = time.time()
                         remove_list.append(item)
+                        
                     elif hasattr(item, "type") and item.type == "star":
                         self.img1 = cv2.resize(self.remove_background_with_alpha(self.star_img1_path), (self.width, self.height))
                         self.img2 = cv2.resize(self.remove_background_with_alpha(self.star_img2_path), (self.width, self.height))
