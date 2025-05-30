@@ -163,6 +163,10 @@ class Player:
                         self.star_mode = True
                         self.star_mode_end_time = time.time() + 5
                         remove_list.append(item)
+                        # 播放 star.mp3，並在 5 秒後停止
+                        pygame.mixer.music.load("music/star.mp3")
+                        pygame.mixer.music.play(-1)  # 循環播放
+                        self.star_music_start_time = time.time()
             for item in remove_list:
                 items.remove(item)
 
@@ -181,6 +185,10 @@ class Player:
             self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
             self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (self.width, self.height))
             self.star_mode = False
+            # 停止 star 音樂，恢復原本背景音樂
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("bgm.mp3")
+            pygame.mixer.music.play(-1)
 
     def get_image(self):
         # 動畫交替與方向處理
