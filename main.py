@@ -6,10 +6,10 @@ import time
 from player import Player
 from castle import Castle
 from castle import Flag
-from coin import coins
+from coin import coins as original_coins,Coin
 from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,draw_clouds
-from item import items
-
+from item import items,Item,item_positions
+from start import show_start_screen, show_tip_screen
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
     alpha = overlay[:, :, 3] / 255.0
@@ -48,16 +48,19 @@ clock = pygame.time.Clock()
 
 canvas_w, canvas_h = 800, 600
 
+show_start_screen()
+show_tip_screen()
+
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
 
 world_w, world_h = 10000, 600
-
-
 
 player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
 
 camera_x = 0  # 相機X軸位置
 
+coins = [Coin(c.x, c.y) for c in original_coins]
+items = [Item(x, y) for x, y in item_positions]
 
 castle = Castle(x=9700, y=375)
 flag = Flag(x=9500, y=150)
@@ -69,6 +72,17 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+            cv2.destroyAllWindows()  # 關掉 OpenCV 視窗
+            show_start_screen()
+            show_tip_screen()
+            # 重新初始化 coins、items、player、camera_x、start_time
+            coins = [Coin(c.x, c.y) for c in original_coins]      # 重新產生金幣
+            items = [Item(x, y) for x, y in item_positions]
+            player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
+            camera_x = 0
+            start_time = time.time()
+            continue
 
     keys = pygame.key.get_pressed()
 
