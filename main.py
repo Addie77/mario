@@ -144,5 +144,35 @@ while True:
     if keys[pygame.K_ESCAPE]:
         break
 
+    if not game_passed and player.x >= 9800 and player.y >= 400:
+        game_passed = True
+        pass_time = int(time.time() - start_time)
+
+    while game_passed:
+        show_finish_screen(canvas, pass_time, player.score)
+        cv2.imshow("mario", canvas)
+        cv2.waitKey(25)
+        clock.tick(60)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    cv2.destroyAllWindows()
+                    show_start_screen()
+                    show_tip_screen()
+                    coins = [Coin(c.x, c.y) for c in original_coins]
+                    items = [Item(x, y) for x, y in item_positions]
+                    player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
+                    camera_x = 0
+                    start_time = time.time()
+                    game_passed = False
+                    break
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    cv2.destroyAllWindows()
+                    sys.exit()
+
 pygame.quit()
-cv2.destroyAllWindows()
+cv2.destroy_allwindows()
