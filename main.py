@@ -144,7 +144,7 @@ while True:
     if keys[pygame.K_ESCAPE]:
         break
 
-    if not game_passed and player.x >= 9800 and player.y >= 400:
+    if not game_passed and player.x >= 9750 and player.y >= 400:
         game_passed = True
         pass_time = int(time.time() - start_time)
 
