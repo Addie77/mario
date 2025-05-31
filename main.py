@@ -144,12 +144,5 @@ while True:
     if keys[pygame.K_ESCAPE]:
         break
 
-    # 檢查遊戲是否通過
-    if not game_passed and player.x >= 9750 and player.y >= 400:
-        game_passed = True
-        pass_time = int(time.time() - start_time)
-        show_finish_screen(pass_time, player.score)
-        break  # 這裡 break 沒關係，因為 show_finish_screen 會等到玩家關閉
-
 pygame.quit()
 cv2.destroyAllWindows()
