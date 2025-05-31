@@ -10,6 +10,7 @@ from coin import coins as original_coins,Coin
 from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,draw_clouds
 from item import items,Item,item_positions
 from start import show_start_screen, show_tip_screen
+from finish import show_finish_screen
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
     alpha = overlay[:, :, 3] / 255.0
@@ -67,6 +68,8 @@ flag = Flag(x=9500, y=150)
 
 start_time = time.time()  # 記錄開始時間
 
+game_passed = False  # 新增遊戲是否通過的標誌
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -82,6 +85,7 @@ while True:
             player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
             camera_x = 0
             start_time = time.time()
+            game_passed = False  # 重置遊戲通過標誌
             continue
 
     keys = pygame.key.get_pressed()
@@ -139,6 +143,13 @@ while True:
 
     if keys[pygame.K_ESCAPE]:
         break
+
+    # 檢查遊戲是否通過
+    if not game_passed and player.x >= 9750 and player.y >= 400:
+        game_passed = True
+        pass_time = int(time.time() - start_time)
+        show_finish_screen(pass_time, player.score)
+        break  # 這裡 break 沒關係，因為 show_finish_screen 會等到玩家關閉
 
 pygame.quit()
 cv2.destroyAllWindows()
