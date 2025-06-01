@@ -76,6 +76,9 @@ speed_map = {1: 5, 2: 10, 3: 15}
 enemy_speed = speed_map.get(difficulty, 1)
 enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
 
+# 初始化
+player_lives = 3
+
 while True:
     if not game_passed:
         for event in pygame.event.get():
@@ -145,6 +148,13 @@ while True:
         cv2.putText(canvas, score_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX,
                     1, (0, 0, 0), 2, cv2.LINE_AA)
 
+        # 顯示生命數
+        heart_text = f"heart x {player_lives}"
+        text_size, _ = cv2.getTextSize(heart_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)
+        text_x = canvas.shape[1] // 2 - text_size[0] // 2
+        text_y = 50
+        cv2.putText(canvas, heart_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3, cv2.LINE_AA)
+
         # 繪製敵人
         for enemy in enemies:
             enemy.update()
@@ -207,5 +217,58 @@ while True:
                     cv2.destroy_allwindows()
                     sys.exit()
 
+    # 主迴圈內敵人 update 後
+    player_lives, hit_enemy = player.check_enemy_collision(enemies, canvas, player_lives)
+    if hit_enemy:
+        if player_lives <= 0:
+            # 遊戲結束處理，顯示 Game Over 畫面並等待玩家操作
+            canvas[:] = (0, 0, 0)
+            over_text = "Game Over"
+            text_size, _ = cv2.getTextSize(over_text, cv2.FONT_HERSHEY_SIMPLEX, 2, 5)
+            text_x = canvas.shape[1] // 2 - text_size[0] // 2
+            text_y = canvas.shape[0] // 2
+            cv2.putText(canvas, over_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5, cv2.LINE_AA)
+            cv2.imshow("mario", canvas)
+            cv2.waitKey(100)  # 短暫顯示
+
+            # 進入等待玩家按鍵的 Game Over 畫面
+            game_over_restart = False
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        cv2.destroyAllWindows()
+                        sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            cv2.destroyAllWindows()
+                            difficulty = show_start_screen()
+                            show_tip_screen()
+                            coins = [Coin(c.x, c.y) for c in original_coins]
+                            items = [Item(x, y) for x, y in item_positions]
+                            player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
+                            camera_x = 0
+                            start_time = time.time()
+                            game_passed = False
+                            player_lives = 3
+                            enemy_speed = speed_map.get(difficulty, 1)
+                            enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
+                            game_over_restart = True
+                        if event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            cv2.destroyAllWindows()
+                            sys.exit()
+                if game_over_restart:
+                    break  # 跳出 Game Over 畫面 while True
+                # 持續顯示 Game Over 畫面
+                cv2.imshow("mario", canvas)
+                cv2.waitKey(25)
+        else:
+            # 只重設道具，不要 new Player
+            coins = [Coin(c.x, c.y) for c in original_coins]
+            items = [Item(x, y) for x, y in item_positions]
+            camera_x = 0
+            player.score = 0  # 歸零分數
+            continue
 pygame.quit()
 cv2.destroy_allwindows()

@@ -36,6 +36,8 @@ class Player:
         self.grow_animating = False
         self.grow_anim_start_time = 0
 
+        self.invincible_until = 0
+
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
         if img is None:
@@ -198,3 +200,31 @@ class Player:
         if self.direction == "left":
             img = cv2.flip(img, 1)
         return img
+
+    def check_enemy_collision(self, enemies, canvas, player_lives):
+        """
+        檢查與敵人碰撞，若碰撞則扣一條命、黑畫面顯示 heart，並回傳剩餘生命值
+        """
+        if time.time() < self.invincible_until:
+            return player_lives, False
+        player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+        for enemy in enemies:
+            enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
+            if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
+                player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
+                player_lives -= 1
+                # 畫面全黑並顯示 heart
+                canvas[:] = (0, 0, 0)
+                heart_text = f"heart x {player_lives}"
+                text_size, _ = cv2.getTextSize(heart_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)
+                text_x = canvas.shape[1] // 2 - text_size[0] // 2
+                text_y = 50
+                cv2.putText(canvas, heart_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3, cv2.LINE_AA)
+                cv2.imshow("mario", canvas)
+                cv2.waitKey(600)  # 0.6秒
+                # 只重設座標與速度，不要 new Player
+                self.x, self.y = 100, 300
+                self.vx, self.vy = 0, 0
+                self.invincible_until = time.time() + 0.8  # 0.8秒無敵
+                return player_lives, True  # True 代表有碰撞
+        return player_lives, False
