@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import time
+import pygame  # 加在檔案最上面
 
 class Player:
     def __init__(self, img1_path, img2_path, x=100, y=100):
@@ -22,6 +24,17 @@ class Player:
         self.width = self.img1.shape[1]
         self.height = self.img1.shape[0]
         self.floor_y = 538  # 地板 y 座標
+        self.score = 0  # 新增分數屬性
+
+        self.origin_img1_path = img1_path
+        self.origin_img2_path = img2_path
+        self.star_img1_path = "images/starwalk1.png"
+        self.star_img2_path = "images/starwalk2.png"
+        self.star_mode = False
+        self.star_mode_end_time = 0
+
+        self.grow_animating = False
+        self.grow_anim_start_time = 0
 
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
@@ -38,7 +51,7 @@ class Player:
         b, g, r = cv2.split(img)
         return cv2.merge((b, g, r, mask))  # BGRA
 
-    def update(self, key_map, canvas_width, platforms, pipe_infos):
+    def update(self, key_map, canvas_width, platforms, pipe_infos, coins=None, world_w=10000, items=None):
         # 水平移動
         self.vx = 0
         if key_map['left']:
@@ -49,7 +62,7 @@ class Player:
             self.direction = "right"
 
         self.x += self.vx
-        self.x = max(0, min(self.x, canvas_width - self.width))
+        self.x = max(0, min(self.x, world_w - self.width))
 
         # 跳躍
         if key_map['jump'] and self.jump_count <= 2:
@@ -107,6 +120,75 @@ class Player:
             self.y = self.floor_y - self.height
             self.vy = 0
             self.jump_count = 0
+
+        # --- 金幣碰撞偵測 ---
+        if coins is not None:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            remove_list = []
+            for coin in coins:
+                coin_rect = (coin.x - 10, coin.y - 10, coin.x + 10, coin.y + 10)  # 半徑10
+                # 簡單矩形碰撞判斷
+                if (player_rect[0] < coin_rect[2] and player_rect[2] > coin_rect[0] and
+                    player_rect[1] < coin_rect[3] and player_rect[3] > coin_rect[1]):
+                    remove_list.append(coin)
+            for coin in remove_list:
+                coins.remove(coin)
+                self.score += 1  # 每吃到一個金幣加一分
+                pygame.mixer.Sound("music/getcoin.mp3").play()  # 播放音效
+
+        # --- 蘑菇碰撞偵測 ---
+        if items is not None:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            remove_list = []
+            for item in items:
+                h, w = item.img.shape[:2]
+                item_rect = (item.x, item.y, item.x + w, item.y + h)
+                if (player_rect[0] < item_rect[2] and player_rect[2] > item_rect[0] and
+                    player_rect[1] < item_rect[3] and player_rect[3] > item_rect[1]):
+                    if hasattr(item, "type") and item.type == "mushroom":
+                        # 進入變大動畫
+                        pygame.mixer.Sound("music/grow.mp3").play()  # 播放變大音效
+                        self.img1 = cv2.resize(self.img1, (80, 80))
+                        self.img2 = cv2.resize(self.img2, (80, 80))
+                        self.y -= 20  # 蘑菇吃掉後稍微往上移動
+                        self.width = 80
+                        self.height = 80
+                        self.grow_animating = True
+                        self.grow_anim_start_time = time.time()
+                        remove_list.append(item)
+                        
+                    elif hasattr(item, "type") and item.type == "star":
+                        self.img1 = cv2.resize(self.remove_background_with_alpha(self.star_img1_path), (self.width, self.height))
+                        self.img2 = cv2.resize(self.remove_background_with_alpha(self.star_img2_path), (self.width, self.height))
+                        self.star_mode = True
+                        self.star_mode_end_time = time.time() + 5
+                        remove_list.append(item)
+                        # 播放 star.mp3，並在 5 秒後停止
+                        pygame.mixer.music.load("music/star.mp3")
+                        pygame.mixer.music.play(-1)  # 循環播放
+                        self.star_music_start_time = time.time()
+            for item in remove_list:
+                items.remove(item)
+
+        # --- 變大動畫進行 ---
+        if self.grow_animating:
+            if time.time() - self.grow_anim_start_time >= 0.5:
+                self.img1 = cv2.resize(self.img1, (100, 100))
+                self.img2 = cv2.resize(self.img2, (100, 100))
+                self.y -= 20
+                self.width = 100
+                self.height = 100
+                self.grow_animating = False
+            return
+        # --- 星星模式倒數 ---
+        if self.star_mode and time.time() > self.star_mode_end_time:
+            self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
+            self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (self.width, self.height))
+            self.star_mode = False
+            # 停止 star 音樂，恢復原本背景音樂
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("bgm.mp3")
+            pygame.mixer.music.play(-1)
 
     def get_image(self):
         # 動畫交替與方向處理

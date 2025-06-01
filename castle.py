@@ -20,6 +20,7 @@ class Castle:
         cv2.rectangle(canvas, (x+20, y+25), (x+60, y+70), (0,0,0), -1)
         cv2.rectangle(canvas, (x+140, y+25), (x+180, y+70), (0,0,0), -1)
         cv2.rectangle(canvas, (x+70, y+80), (x+130, y+150), (0,0,0), -1)
+        cv2.rectangle(canvas, (x+80, y+95), (x+120, y+150), (40,40,40), -1)
         # 側塔
         cv2.rectangle(canvas, (x-55, y-75), (x+0, y+150), self.deep_brick, -1)
         cv2.rectangle(canvas, (x-65, y-95), (x+10, y-75), self.brick, -1)
@@ -48,6 +49,8 @@ class Flag:
 if __name__ == "__main__":
     canva = np.ones((600, 800, 3), dtype=np.uint8) * 255
     flag = Flag(120, 150)
+    castle = Castle(400, 375)
+    castle.draw(canva, 0)
     flag.draw(canva, 0)
     cv2.imshow("Flag", canva)
     cv2.waitKey()
