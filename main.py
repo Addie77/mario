@@ -11,6 +11,8 @@ from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,dr
 from item import items,Item,item_positions
 from start import show_start_screen, show_tip_screen
 from finish import show_finish_screen
+from enemy import Enemy, enemy_positions
+
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
     alpha = overlay[:, :, 3] / 255.0
@@ -49,7 +51,7 @@ clock = pygame.time.Clock()
 
 canvas_w, canvas_h = 800, 600
 
-show_start_screen()
+difficulty = show_start_screen()  # 1, 2, 3
 show_tip_screen()
 
 canvas = np.ones((canvas_h, canvas_w, 3), dtype=np.uint8) * 255
@@ -70,6 +72,10 @@ start_time = time.time()  # 記錄開始時間
 
 game_passed = False  # 新增遊戲是否通過的標誌
 
+speed_map = {1: 5, 2: 10, 3: 15}
+enemy_speed = speed_map.get(difficulty, 1)
+enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
+
 while True:
     if not game_passed:
         for event in pygame.event.get():
@@ -77,16 +83,17 @@ while True:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                cv2.destroyAllWindows()  # 關掉 OpenCV 視窗
-                show_start_screen()
+                cv2.destroyAllWindows()
+                difficulty = show_start_screen()
                 show_tip_screen()
-                # 重新初始化 coins、items、player、camera_x、start_time
-                coins = [Coin(c.x, c.y) for c in original_coins]      # 重新產生金幣
+                coins = [Coin(c.x, c.y) for c in original_coins]
                 items = [Item(x, y) for x, y in item_positions]
                 player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
                 camera_x = 0
                 start_time = time.time()
-                game_passed = False  # 重置遊戲通過標誌
+                game_passed = False
+                enemy_speed = speed_map.get(difficulty, 1)
+                enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
                 continue
 
         keys = pygame.key.get_pressed()
@@ -137,6 +144,11 @@ while True:
         text_y = 40
         cv2.putText(canvas, score_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX,
                     1, (0, 0, 0), 2, cv2.LINE_AA)
+
+        # 繪製敵人
+        for enemy in enemies:
+            enemy.update()
+            enemy.draw(canvas, camera_x)
 
         cv2.imshow("mario", canvas)
         cv2.waitKey(25)
@@ -192,7 +204,7 @@ while True:
                     break
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    cv2.destroyAllWindows()
+                    cv2.destroy_allwindows()
                     sys.exit()
 
 pygame.quit()
