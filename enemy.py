@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 class Enemy:
-    def __init__(self, x, y, speed=1, move_range=200):
+    def __init__(self, x, y, speed=1, move_range=100):
         self.init_x = x
         self.x = x
         self.y = y
@@ -53,4 +53,9 @@ class Enemy:
 # 只保留座標，不要建立 enemies
 enemy_positions = [
     (2100, 475),
+    (3200, 475),
+    (4800, 475),
+    (5600, 475),
+    (6780, 335),
+    (8500, 475),
 ]
