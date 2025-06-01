@@ -1,33 +1,40 @@
 import sqlite3
 import os
 
-# 確保 db 資料夾存在
 db_dir = os.path.join(os.path.dirname(__file__), "db")
 os.makedirs(db_dir, exist_ok=True)
-
 db_path = os.path.join(db_dir, "sqlite.db")
 
 try:
     conn = sqlite3.connect(db_path)
-    print(f"成功打開資料庫：{db_path}")
-
     cursor = conn.cursor()
-    # 建立 time 資料表
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS time (
-            id INTEGER PRIMARY KEY NOT NULL,
-            time INTEGER NOT NULL
-        )
-    ''')
-    # 建立 score 資料表
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS score (
-            id INTEGER PRIMARY KEY NOT NULL,
+        CREATE TABLE IF NOT EXISTS history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            time INTEGER NOT NULL,
             score INTEGER NOT NULL
         )
     ''')
     conn.commit()
-    print("資料表檢查/建立完成")
     conn.close()
 except Exception as e:
-    print(f"打開資料庫失敗：{e}")
+    print(f"資料表建立失敗：{e}")
+
+def save_history(pass_time, score):
+    db_path = os.path.join(os.path.dirname(__file__), "db", "sqlite.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO history (time, score) VALUES (?, ?)", (pass_time, score))
+    conn.commit()
+    conn.close()
+
+def get_best_history():
+    db_path = os.path.join(os.path.dirname(__file__), "db", "sqlite.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("SELECT time FROM history ORDER BY time ASC LIMIT 3")
+    best_times = [str(r[0]) for r in cursor.fetchall()]
+    cursor.execute("SELECT score FROM history ORDER BY score DESC LIMIT 3")
+    best_scores = [str(r[0]) for r in cursor.fetchall()]
+    conn.close()
+    return best_times, best_scores
