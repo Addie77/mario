@@ -156,6 +156,7 @@ class Player:
                         self.img2 = cv2.resize(self.img2, (100, 100))
                         self.width = 100
                         self.height = 100
+                        self.y -= 30
                         self.big_mode = True  # 變大
                         self.grow_animating = True
                         self.grow_anim_start_time = time.time()
@@ -179,7 +180,6 @@ class Player:
             if time.time() - self.grow_anim_start_time >= 0.5:
                 self.img1 = cv2.resize(self.img1, (100, 100))
                 self.img2 = cv2.resize(self.img2, (100, 100))
-                self.y -= 20
                 self.width = 100
                 self.height = 100
                 self.big_mode = True  # 變大
@@ -231,15 +231,26 @@ class Player:
                 enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
                 if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
                     player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
-                    # 變回原本大小
-                    pygame.mixer.Sound("music/besmall.mp3").play()
-                    self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (70, 70))
-                    self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (70, 70))
-                    self.width = 70
-                    self.height = 70
-                    self.big_mode = False
-                    self.invincible_until = time.time() + 1  # 1秒無敵緩衝
-                    return player_lives, False  # 只變小，不扣命
+                    # 判斷是否從上方踩到敵人
+                    player_bottom_last = self.y + self.height - self.vy  # 上一幀底部
+                    enemy_top = enemy.y
+                    if self.vy > 0 and player_bottom_last <= enemy_top:
+                        # 從上方踩到敵人
+                        if enemy in enemies:
+                            enemies.remove(enemy)
+                        self.score += 1
+                        self.vy = self.jump_strength // 2  # 踩到後彈跳
+                        return player_lives, False  # 沒有扣命
+                    else:
+                        # 側面或下方碰撞，變回原本大小
+                        pygame.mixer.Sound("music/besmall.mp3").play()
+                        self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (70, 70))
+                        self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (70, 70))
+                        self.width = 70
+                        self.height = 70
+                        self.big_mode = False
+                        self.invincible_until = time.time() + 1  # 1秒無敵緩衝
+                        return player_lives, False  # 只變小，不扣命
 
         # 其餘情況才會扣命
         player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)

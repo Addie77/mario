@@ -8,6 +8,7 @@ tip_lines = [
 tip =[
     "W,space: Jump",
     "A,D: Move Left and Right",
+    "R: Restart",
     "ESC: Exit",
 ]
 def show_start_screen():
@@ -47,5 +48,5 @@ def show_tip_screen():
     for line in tip:
             tip_surface = font_small.render(line, True, (0, 0, 0))
             screen.blit(tip_surface, (10, y))
-            y += 45  # 每行往下移一點
+            y += 25  # 每行往下移一點
     pygame.display.flip()
