@@ -94,6 +94,7 @@ while True:
                 player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
                 camera_x = 0
                 start_time = time.time()
+                player_lives = 3
                 game_passed = False
                 enemy_speed = speed_map.get(difficulty, 1)
                 enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
@@ -207,10 +208,12 @@ while True:
                     show_tip_screen()
                     coins = [Coin(c.x, c.y) for c in original_coins]
                     items = [Item(x, y) for x, y in item_positions]
+                    enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
                     player = Player("images/walk1.png", "images/walk2.png", x=100, y=300)
                     camera_x = 0
                     start_time = time.time()
                     game_passed = False
+                    player_lives = 3
                     break
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
