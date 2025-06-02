@@ -38,6 +38,8 @@ class Player:
 
         self.invincible_until = 0
 
+        self.big_mode = False  # 新增
+
     def remove_background_with_alpha(self, img_path, threshold=40):
         img = cv2.imread(img_path)
         if img is None:
@@ -150,11 +152,11 @@ class Player:
                     if hasattr(item, "type") and item.type == "mushroom":
                         # 進入變大動畫
                         pygame.mixer.Sound("music/grow.mp3").play()  # 播放變大音效
-                        self.img1 = cv2.resize(self.img1, (80, 80))
-                        self.img2 = cv2.resize(self.img2, (80, 80))
-                        self.y -= 20  # 蘑菇吃掉後稍微往上移動
-                        self.width = 80
-                        self.height = 80
+                        self.img1 = cv2.resize(self.img1, (100, 100))
+                        self.img2 = cv2.resize(self.img2, (100, 100))
+                        self.width = 100
+                        self.height = 100
+                        self.big_mode = True  # 變大
                         self.grow_animating = True
                         self.grow_anim_start_time = time.time()
                         remove_list.append(item)
@@ -180,6 +182,7 @@ class Player:
                 self.y -= 20
                 self.width = 100
                 self.height = 100
+                self.big_mode = True  # 變大
                 self.grow_animating = False
             return
         # --- 星星模式倒數 ---
@@ -205,7 +208,11 @@ class Player:
         """
         檢查與敵人碰撞，若碰撞則扣一條命、黑畫面顯示 heart，並回傳剩餘生命值
         """
-        # 星星無敵期間，碰到敵人直接消滅敵人，不扣命
+        # 1秒無敵緩衝期間，什麼都不做
+        if time.time() < self.invincible_until:
+            return player_lives, False
+
+        # 星星無敵判斷（如果有 star_mode）
         if self.star_mode:
             player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
             for enemy in enemies[:]:
@@ -217,9 +224,23 @@ class Player:
                     self.score += 1
             return player_lives, False  # 無敵時不會扣命
 
-        # --- 以下維持原本碰撞規則 ---
-        if time.time() < self.invincible_until:
-            return player_lives, False
+        # 變大狀態下碰到敵人，只變回原本大小，不扣命
+        if self.big_mode:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            for enemy in enemies:
+                enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
+                if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
+                    player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
+                    # 變回原本大小
+                    self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (70, 70))
+                    self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (70, 70))
+                    self.width = 70
+                    self.height = 70
+                    self.big_mode = False
+                    self.invincible_until = time.time() + 1  # 1秒無敵緩衝
+                    return player_lives, False  # 只變小，不扣命
+
+        # 其餘情況才會扣命
         player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
         for enemy in enemies:
             enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
