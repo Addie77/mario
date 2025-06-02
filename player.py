@@ -232,6 +232,7 @@ class Player:
                 if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
                     player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
                     # 變回原本大小
+                    pygame.mixer.Sound("music/besmall.mp3").play()
                     self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (70, 70))
                     self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (70, 70))
                     self.width = 70
