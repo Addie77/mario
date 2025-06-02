@@ -269,6 +269,7 @@ while True:
             items = [Item(x, y) for x, y in item_positions]
             camera_x = 0
             player.score = 0  # 歸零分數
+            enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]  # 重新生成敵人
             continue
 pygame.quit()
 cv2.destroy_allwindows()

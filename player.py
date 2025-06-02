@@ -187,7 +187,7 @@ class Player:
             self.img1 = cv2.resize(self.remove_background_with_alpha(self.origin_img1_path), (self.width, self.height))
             self.img2 = cv2.resize(self.remove_background_with_alpha(self.origin_img2_path), (self.width, self.height))
             self.star_mode = False
-            # 停止 star 音樂，恢復原本背景音樂
+            # 恢復音樂
             pygame.mixer.music.stop()
             pygame.mixer.music.load("bgm.mp3")
             pygame.mixer.music.play(-1)
@@ -205,6 +205,19 @@ class Player:
         """
         檢查與敵人碰撞，若碰撞則扣一條命、黑畫面顯示 heart，並回傳剩餘生命值
         """
+        # 星星無敵期間，碰到敵人直接消滅敵人，不扣命
+        if self.star_mode:
+            player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+            for enemy in enemies[:]:
+                enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
+                if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
+                    player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
+                    if enemy in enemies:
+                        enemies.remove(enemy)
+                    self.score += 1
+            return player_lives, False  # 無敵時不會扣命
+
+        # --- 以下維持原本碰撞規則 ---
         if time.time() < self.invincible_until:
             return player_lives, False
         player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
