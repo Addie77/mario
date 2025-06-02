@@ -210,21 +210,32 @@ class Player:
         player_rect = (self.x, self.y, self.x + self.width, self.y + self.height)
         for enemy in enemies:
             enemy_rect = (enemy.x, enemy.y, enemy.x + 50, enemy.y + 50)
+            # 判斷是否碰撞
             if (player_rect[0] < enemy_rect[2] and player_rect[2] > enemy_rect[0] and
                 player_rect[1] < enemy_rect[3] and player_rect[3] > enemy_rect[1]):
-                player_lives -= 1
-                # 畫面全黑並顯示 heart
-                canvas[:] = (0, 0, 0)
-                heart_text = f"heart x {player_lives}"
-                text_size, _ = cv2.getTextSize(heart_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)
-                text_x = canvas.shape[1] // 2 - text_size[0] // 2
-                text_y = 50
-                cv2.putText(canvas, heart_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3, cv2.LINE_AA)
-                cv2.imshow("mario", canvas)
-                cv2.waitKey(600)  # 0.6秒
-                # 只重設座標與速度，不要 new Player
-                self.x, self.y = 100, 300
-                self.vx, self.vy = 0, 0
-                self.invincible_until = time.time() + 0.8  # 0.8秒無敵
-                return player_lives, True  # True 代表有碰撞
+                # 判斷是否從上方踩到敵人
+                player_bottom_last = self.y + self.height - self.vy  # 上一幀底部
+                enemy_top = enemy.y
+                if self.vy > 0 and player_bottom_last <= enemy_top:
+                    # 從上方踩到敵人
+                    if enemy in enemies:
+                        enemies.remove(enemy)
+                    self.score += 1
+                    self.vy = self.jump_strength // 2  # 踩到後彈跳
+                    return player_lives, False  # 沒有扣命
+                else:
+                    # 側面或下方碰撞，扣命
+                    player_lives -= 1
+                    canvas[:] = (0, 0, 0)
+                    heart_text = f"heart x {player_lives}"
+                    text_size, _ = cv2.getTextSize(heart_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)
+                    text_x = canvas.shape[1] // 2 - text_size[0] // 2
+                    text_y = 50
+                    cv2.putText(canvas, heart_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3, cv2.LINE_AA)
+                    cv2.imshow("mario", canvas)
+                    cv2.waitKey(600)
+                    self.x, self.y = 100, 300
+                    self.vx, self.vy = 0, 0
+                    self.invincible_until = time.time() + 0.8
+                    return player_lives, True
         return player_lives, False
