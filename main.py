@@ -73,7 +73,7 @@ start_time = time.time()  # 記錄開始時間
 
 game_passed = False  # 新增遊戲是否通過的標誌
 
-speed_map = {1: 5, 2: 10, 3: 15}
+speed_map = {1: 5, 2: 10, 3: 17}
 enemy_speed = speed_map.get(difficulty, 1)
 enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
 
