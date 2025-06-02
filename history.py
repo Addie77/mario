@@ -38,3 +38,11 @@ def get_best_history():
     best_scores = [str(r[0]) for r in cursor.fetchall()]
     conn.close()
     return best_times, best_scores
+
+def clear_history():
+    db_path = os.path.join(os.path.dirname(__file__), "db", "sqlite.db")
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM history")
+    conn.commit()
+    conn.close()
