@@ -1,5 +1,5 @@
 import pygame
-
+from history import clear_history
 tip_lines = [
     "Press 1 : easy game",
     "Press 2 : normal game",
@@ -28,8 +28,11 @@ def show_start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
-                sys.exit()
+                
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_0 or event.key == pygame.K_KP0:
+                    clear_history()
+                    print("排行榜已清空！")
                 if event.key == pygame.K_1 or event.key == pygame.K_KP1:
                     return 1
                 elif event.key == pygame.K_2 or event.key == pygame.K_KP2:

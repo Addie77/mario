@@ -10,9 +10,7 @@ from coin import coins as original_coins,Coin
 from background_element import platforms,pipe_infos,draw_platforms,draw_pipes,draw_clouds
 from item import items,Item,item_positions
 from start import show_start_screen, show_tip_screen
-from finish import show_finish_screen
 from enemy import Enemy, enemy_positions
-from history import clear_history
 
 def paste_transparent(imgBackground, overlay, x, y):
     bgr = overlay[:, :, :3]
@@ -45,7 +43,7 @@ def paste_transparent(imgBackground, overlay, x, y):
     return imgBackground
 
 pygame.init()
-pygame.mixer.music.load("bgm.mp3")
+pygame.mixer.music.load("music/bgm.mp3")
 pygame.mixer.music.play(-1)
 pygame.display.set_mode((200, 100))
 clock = pygame.time.Clock()
@@ -100,9 +98,7 @@ while True:
                 enemy_speed = speed_map.get(difficulty, 1)
                 enemies = [Enemy(x, y, speed=enemy_speed) for x, y in enemy_positions]
                 continue
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_0:
-                clear_history()
-                print("排行榜已清空！")
+            
 
         keys = pygame.key.get_pressed()
 
@@ -168,7 +164,7 @@ while True:
         cv2.imshow("mario", canvas)
         cv2.waitKey(25)
         clock.tick(60)
-
+        
         if keys[pygame.K_ESCAPE]:
             break
 

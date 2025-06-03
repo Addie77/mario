@@ -66,7 +66,7 @@ class Player:
             self.direction = "right"
 
         self.x += self.vx
-        self.x = max(0, min(self.x, world_w - self.width))
+        self.x = max(0, min(self.x, world_w - self.width))  # 限制不超出左邊與右邊
 
         # 跳躍
         if key_map['jump'] and self.jump_count <= 2:
@@ -192,7 +192,7 @@ class Player:
             self.star_mode = False
             # 恢復音樂
             pygame.mixer.music.stop()
-            pygame.mixer.music.load("bgm.mp3")
+            pygame.mixer.music.load("music/bgm.mp3")
             pygame.mixer.music.play(-1)
 
     def get_image(self):
